@@ -1,6 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import "@fontsource-variable/onest";
+import "@fontsource-variable/playfair-display";
 
 interface Props {
   title: string;
@@ -20,21 +21,30 @@ const { title } = Astro.props;
     <title>{title}</title>
   </head>
 
-  <body>
+  <body class="relative">
     <Header />
     <slot />
   </body>
 </html>
 <style is:global>
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
+
   html {
-    font-family: "Onest Variable", system-ui, sans-serif;
+    font-family: "Playfair Display Variable", "Onest Variable", system-ui,
+      sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
-    background: #050505;
+    background-color: #fffdfa;
     display: flex;
     flex-direction: column;
     min-height: 100vh;

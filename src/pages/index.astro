@@ -1,20 +1,106 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Badge from "../components/Badge.astro";
+import SocialPill from "../components/SocialPill.astro";
+import LinkedIn from "../components/icons/LinkedIn.astro";
+import Section from "../components/Section.astro";
+import ProjectCard from "../components/ProjectCard.astro";
 ---
 
 <Layout title="Welcome to Astro.">
   <main>
-    <section class="w-full lg:w-[740px] mx-auto py-44">
-      <h1 class="text-white text-5xl font-bold flex flex-row gap-x-4 pb-4">
+    <Section class="py-8">
+      <!-- <img
+        class="rounded-full w-12 h-12 mb-4"
+        src="/src/images/profile.jpg"
+        alt="profile pic"
+      />-->
+
+      <h1 class="text-5xl flex flex-row gap-x-4 pb-10">
         Hey, I'm Alvaro <div class="flex justify-center items-center">
-          <Badge>Available for work</Badge>
+          <a
+            href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex justify-center items-center"
+          >
+            <Badge>Available for work</Badge>
+          </a>
         </div>
       </h1>
-      <h2 class="text-xl opacity-80">
+      <h2 class="text-xl opacity-80 text-wrap">
         Mas de 1 año de experiencia. Matemático e Ingieniero Informatico con
         experiencia en desarrollo de software y analisis de datos.
       </h2>
-    </section>
+
+      <nav class="flex gap-x-2">
+        <SocialPill
+          href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
+        >
+          <LinkedIn />
+          LinkedIn
+        </SocialPill>
+      </nav>
+    </Section>
+    <Section id="experiencie" class="py-8">
+      <h2 class="text-3xl pb-10">About me</h2>
+
+      <ol class="relative border-s border-gray-200 dark:border-gray-700">
+        <li class="mb-10 ms-4">
+          <div
+            class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"
+          >
+          </div>
+          <time
+            class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500"
+            >September 2024</time
+          >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Junior Software Engineer - Indra
+          </h3>
+          <p
+            class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400"
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in
+            tempus eros. Nulla facilisi. Nunc iaculis orci ut tempor accumsan.
+            Ut commodo orci eget turpis pharetra vulputate. Morbi gravida
+            dapibus metus, quis venenatis sapien malesuada commodo.
+          </p>
+        </li>
+        <li class="mb-10 ms-4">
+          <div
+            class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"
+          >
+          </div>
+          <time
+            class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500"
+            >September 2019 - June 2024</time
+          >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Double degree in Mathematics and Computer Science - UMA
+          </h3>
+          <p
+            class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400"
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in
+            tempus eros. Nulla facilisi. Nunc iaculis orci ut tempor accumsan.
+            Ut commodo orci eget turpis pharetra vulputate. Morbi gravida
+            dapibus metus, quis venenatis sapien malesuada commodo.
+          </p>
+        </li>
+      </ol>
+    </Section>
+    <Section id="projects" class="py-8">
+      <h2 class="text-3xl pb-10">Cool stuff I've done</h2>
+      <ProjectCard
+        title="Text2Math"
+        description="A way to create png image from LaTeX or AsciiMath"
+        link="https://text2math.vercel.app/"
+        image="/src/images/text2math.png"
+      />
+    </Section>
+    <Section id="blog" class="py-8">
+      <h2 class="text-3xl pb-10">Blog</h2>
+    </Section>
   </main>
 </Layout>
