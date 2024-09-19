@@ -1,120 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Badge from "../components/Badge.astro";
-import SocialPill from "../components/SocialPill.astro";
-import LinkedIn from "../components/icons/LinkedIn.astro";
+import Intro from "../components/Intro.astro";
+import AboutMe from "../components/AboutMe.astro";
+import Projects from "../components/Projects.astro";
 import Section from "../components/Section.astro";
-import ProjectCard from "../components/ProjectCard.astro";
-import GitHub from "../components/icons/GitHub.astro";
-import Mail from "../components/icons/Mail.astro";
-import X from "../components/icons/X.astro";
 ---
 
 <Layout title="Welcome to Astro.">
   <main>
-    <Section class="pt-8 pb-4">
-      <!-- <img
-        class="rounded-full w-12 h-12 mb-4"
-        src="/src/images/profile.jpg"
-        alt="profile pic"
-      />-->
-
-      <h1 class="text-5xl flex flex-row gap-x-4 pb-4">
-        Hey, I'm Alvaro <div class="flex justify-center items-center">
-          <a
-            href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex justify-center items-center"
-          >
-            <!-- <Badge>Available for work</Badge>-->
-          </a>
-        </div>
-      </h1>
-      <h2 class="text-2xl opacity-80 text-wrap pb-4">
-        A software engineer with a passion for <span>learning and creating</span
-        >.
-      </h2>
-
-      <nav class="flex gap-x-2">
-        <SocialPill
-          href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
-        >
-          <LinkedIn />
-        </SocialPill>
-        <SocialPill href="https://github.com/alvarosh15">
-          <GitHub />
-        </SocialPill>
-        <SocialPill href="https://x.com/alvarox27">
-          <X />
-        </SocialPill>
-        <SocialPill href="mailto:alvaro.s.h.15@gmail.com">
-          <Mail />
-          alvaro.s.h.15@gmail.com
-        </SocialPill>
-      </nav>
-    </Section>
-    <Section id="experiencie" class="py-4">
-      <h2 class="text-3xl pb-4">About me</h2>
-      <p class="pb-4">
-        I studied Mathematics and Computer Engineering at the University of
-        Málaga. I’m passionate about programming and design, with a special love
-        for full-stack development.
-      </p>
-      <ol class="relative border-s border-gray-200 dark:border-gray-700">
-        <li class="mb-10 ms-4">
-          <div
-            class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"
-          >
-          </div>
-          <time
-            class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500"
-            >September 2024</time
-          >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Junior Software Engineer - Indra
-          </h3>
-          <p
-            class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400"
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in
-            tempus eros. Nulla facilisi. Nunc iaculis orci ut tempor accumsan.
-            Ut commodo orci eget turpis pharetra vulputate. Morbi gravida
-            dapibus metus, quis venenatis sapien malesuada commodo.
-          </p>
-        </li>
-        <li class="mb-10 ms-4">
-          <div
-            class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"
-          >
-          </div>
-          <time
-            class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500"
-            >September 2019 - June 2024</time
-          >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Double degree in Mathematics and Computer Science - UMA
-          </h3>
-          <p
-            class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400"
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in
-            tempus eros. Nulla facilisi. Nunc iaculis orci ut tempor accumsan.
-            Ut commodo orci eget turpis pharetra vulputate. Morbi gravida
-            dapibus metus, quis venenatis sapien malesuada commodo.
-          </p>
-        </li>
-      </ol>
-    </Section>
-    <Section id="projects" class="py-4">
-      <h2 class="text-4xl pb-10">Cool stuff I've done</h2>
-      <ProjectCard
-        title="Text2Math"
-        description="A way to create png image from LaTeX or AsciiMath"
-        link="https://text2math.vercel.app/"
-        image="/src/images/text2math.png"
-      />
-    </Section>
+    <Intro />
+    <AboutMe />
+    <Projects />
     <Section id="blog" class="py-4">
       <h2 class="text-3xl pb-10">Blog</h2>
     </Section>

@@ -1,0 +1,45 @@
+---
+import Badge from "../components/Badge.astro";
+import SocialPill from "../components/SocialPill.astro";
+import LinkedIn from "../components/icons/LinkedIn.astro";
+import Section from "../components/Section.astro";
+import GitHub from "../components/icons/GitHub.astro";
+import Mail from "../components/icons/Mail.astro";
+import X from "../components/icons/X.astro";
+---
+
+<Section class="pt-8 pb-4">
+  <h1 class="text-5xl flex flex-row gap-x-4 pb-4">
+    Hey, I'm Alvaro <div class="flex justify-center items-center">
+      <a
+        href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex justify-center items-center"
+      >
+        <!-- <Badge>Available for work</Badge>-->
+      </a>
+    </div>
+  </h1>
+  <h2 class="text-2xl opacity-80 text-wrap pb-4">
+    A software engineer with a passion for <span>learning and creating</span>,
+    with a special love for full-stack development and AI. I’m always looking
+    for new challenges and opportunities to learn and grow.
+  </h2>
+
+  <nav class="flex gap-x-2">
+    <SocialPill href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/">
+      <LinkedIn />
+    </SocialPill>
+    <SocialPill href="https://github.com/alvarosh15">
+      <GitHub />
+    </SocialPill>
+    <SocialPill href="https://x.com/alvarox27">
+      <X />
+    </SocialPill>
+    <SocialPill href="mailto:alvaro.s.h.15@gmail.com">
+      <Mail />
+      alvaro.s.h.15@gmail.com
+    </SocialPill>
+  </nav>
+</Section>

@@ -1,0 +1,35 @@
+---
+import Section from "../components/Section.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+
+const projects = [
+  {
+    title: "Text2Math",
+    description:
+      "A way to input text in LaTex or AsciiMath and get a png image to share across social media",
+    link: "https://text2math.vercel.app/",
+    image: "/src/images/text2math.png",
+  },
+  {
+    title: "CleanText and MiniMarkdown",
+    description:
+      "A minimalist markdown web editor and my own parser for a subset of Markdown.",
+    link: "https://text2math.vercel.app/",
+    image: "/src/images/cleantext.png",
+  },
+  {
+    title: "Amazon Last Mille Routing Challenge Dashboard",
+    description:
+      'Full-stack application for visualizing and managing data from the "Amazon Last Mile Routing Research Challenge" dataset. My end-of-degree project marked with top marks.',
+    link: "https://text2math.vercel.app/",
+    image: "/src/images/dashboard.png",
+  },
+];
+---
+
+<Section id="projects" class="py-4">
+  <h2 class="text-4xl pb-10">Cool stuff I've done</h2>
+  <div class="flex flex-col gap-y-10">
+    {projects.map((project) => <ProjectCard {...project} />)}
+  </div>
+</Section>
