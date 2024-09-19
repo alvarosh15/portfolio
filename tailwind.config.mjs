@@ -4,6 +4,11 @@ export default {
   darkMode: "class",
   theme: {
     extend: {},
+    colors: {
+      "light-brown-bg": "#fffdfa",
+      "dark-brown-bg": "#f4f0e7",
+      "dark-brown-text": "#a69b85",
+    },
   },
   plugins: [],
 };

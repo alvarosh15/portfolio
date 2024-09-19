@@ -2,18 +2,26 @@
 const { title, description, link, image } = Astro.props;
 ---
 
-<div class="flex flex-col rounded-3xl gap-y-2 bg-[#f4f0e7] p-4">
-  <h2 class="text-3xl font-semibold">{title}</h2>
-  <h3 class="text-xl text-[#a69b85]">
-    {description}
-  </h3>
-  <a
-    href={link}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="text-[#a69b85] border-[#a69b85] size-fit rounded-lg border-2 text-xl p-2"
-  >
-    Visit →</a
-  >
-  <img src={image} alt="Text2Math" class="" />
+<div
+  class="relative group h-[32rem] overflow-hidden rounded-3xl bg-dark-brown-bg p-4"
+>
+  <div class="z-10 flex flex-col gap-y-2">
+    <h2 class="text-2xl">{title}</h2>
+    <h3 class="text-xl text-dark-brown-text">
+      {description}
+    </h3>
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-xl py-2 px-4"
+    >
+      Visit →</a
+    >
+  </div>
+  <img
+    src={image}
+    alt="Text2Math Screenshot"
+    class="absolute top-30 left-32 scale-110 w-full h-full object-cover rounded-3xl transition-transform duration-300 ease-in-out group-hover:scale-125"
+  />
 </div>
