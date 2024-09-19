@@ -1,6 +1,7 @@
 ---
 import Section from "../components/Section.astro";
 import ProjectCard from "../components/ProjectCard.astro";
+import { Image } from "astro:assets";
 
 const projects = [
   {
@@ -9,7 +10,7 @@ const projects = [
       "A way to input text in LaTex or AsciiMath and get a png image to share across social media",
     link: "https://text2math.vercel.app/",
     github: "https://github.com/alvarosh15/text2math",
-    image: "../public/text2math.png",
+    image: "/src/images/text2math.png",
   },
   {
     title: "CleanText and MiniMarkdown",
@@ -17,7 +18,7 @@ const projects = [
       "A minimalist markdown web editor and my own parser for a subset of Markdown.",
     link: "",
     github: "https://github.com/alvarosh15/cleantext",
-    image: "../public/cleantext.png",
+    image: "/src/images/cleantext.png",
   },
   {
     title: "Amazon Last Mille Routing Challenge Dashboard",
@@ -25,7 +26,7 @@ const projects = [
       'Full-stack application for visualizing and managing data from the "Amazon Last Mile Routing Research Challenge" dataset. My end-of-degree project marked with top marks.',
     link: "",
     github: "https://github.com/alvarosh15/dashboard",
-    image: "../public/dashboard.png",
+    image: "/src/images/dashboard.png",
   },
 ];
 ---
