@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` / `npm start` — Start dev server (localhost:4321)
 - `npm run build` — Build to `./dist/`
 - `npm run preview` — Preview production build
+- `npm run lint` — Lint with oxlint
 - No test suite configured
 
 ## Architecture
