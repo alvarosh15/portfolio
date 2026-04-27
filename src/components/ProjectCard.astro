@@ -1,4 +1,6 @@
 ---
+import { CursorIcon } from "../constants/cursor-icons";
+
 const { title, description, link, github, image } = Astro.props;
 ---
 
@@ -18,6 +20,8 @@ const { title, description, link, github, image } = Astro.props;
           rel="noopener noreferrer"
           class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-xl py-2 px-4
   hover:text-dark-brown-bg hover:border-dark-brown-bg hover:bg-dark-brown-text"
+          data-cursor-text="View Code"
+          data-cursor-icon={CursorIcon.Github}
         >
           Github
         </a>
@@ -31,6 +35,8 @@ const { title, description, link, github, image } = Astro.props;
           rel="noopener noreferrer"
           class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-xl py-2 px-4
     hover:text-dark-brown-bg hover:border-dark-brown-bg hover:bg-dark-brown-text"
+          data-cursor-text="Visit Project"
+          data-cursor-icon={CursorIcon.External}
         >
           Visit →
         </a>

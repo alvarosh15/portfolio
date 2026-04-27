@@ -1,6 +1,6 @@
 ---
-import Badge from "../components/Badge.astro";
 import SocialPill from "../components/SocialPill.astro";
+import { CursorIcon } from "../constants/cursor-icons";
 import LinkedIn from "../components/icons/LinkedIn.astro";
 import Section from "../components/Section.astro";
 import GitHub from "../components/icons/GitHub.astro";
@@ -27,16 +27,32 @@ import X from "../components/icons/X.astro";
   </h2>
 
   <nav class="flex flex-wrap gap-2">
-    <SocialPill href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/">
+    <SocialPill
+      href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
+      data-cursor-text="View LinkedIn"
+      data-cursor-icon={CursorIcon.LinkedIn}
+    >
       <LinkedIn />
     </SocialPill>
-    <SocialPill href="https://github.com/alvarosh15">
+    <SocialPill
+      href="https://github.com/alvarosh15"
+      data-cursor-text="View GitHub"
+      data-cursor-icon={CursorIcon.Github}
+    >
       <GitHub />
     </SocialPill>
-    <SocialPill href="https://x.com/alvarombt">
+    <SocialPill
+      href="https://x.com/alvarombt"
+      data-cursor-text="View X"
+      data-cursor-icon={CursorIcon.X}
+    >
       <X />
     </SocialPill>
-    <SocialPill href="mailto:alvaro.s.h.15@gmail.com">
+    <SocialPill
+      href="mailto:alvaro.s.h.15@gmail.com"
+      data-cursor-text="Send Email"
+      data-cursor-icon={CursorIcon.Mail}
+    >
       <Mail />
       alvaro.s.h.15@gmail.com
     </SocialPill>
