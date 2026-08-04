@@ -6,18 +6,38 @@ import "@fontsource-variable/playfair-display";
 
 interface Props {
   title: string;
+  description?: string;
+  image?: string;
 }
 
-const { title } = Astro.props;
+const {
+  title,
+  description = "Portfolio of Alvaro Sanchez, a software engineer focused on full-stack development, artificial intelligence, and security-oriented projects.",
+  image = "/projects/malwareai.png",
+} = Astro.props;
+const canonicalUrl = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : undefined;
+const socialImageUrl = Astro.site ? new URL(image, Astro.site).toString() : image;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Alvaro's portfolio" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageUrl} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
     <title>{title}</title>
   </head>
 
@@ -70,6 +90,13 @@ const { title } = Astro.props;
   a,
   button {
     cursor: none;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid #ec735b;
+    outline-offset: 4px;
+    border-radius: 9999px;
   }
 
   .cursor {
@@ -128,7 +155,9 @@ const { title } = Astro.props;
   });
 
   document.addEventListener("mouseover", (e) => {
-    const target = (e.target as HTMLElement).closest("[data-cursor-text]");
+    if (!(e.target instanceof Element)) return;
+
+    const target = e.target.closest("[data-cursor-text]");
     if (target && cursor && cursorText && cursorIcon) {
       const el = target as HTMLElement;
       cursorText.textContent = el.dataset.cursorText ?? "";
@@ -152,7 +181,9 @@ const { title } = Astro.props;
   });
 
   document.addEventListener("mouseout", (e) => {
-    const target = (e.target as HTMLElement).closest("[data-cursor-text]");
+    if (!(e.target instanceof Element)) return;
+
+    const target = e.target.closest("[data-cursor-text]");
     if (target && cursor && cursorText && cursorIcon) {
       cursor.style.width = `${CURSOR_SIZE}px`;
       cursor.style.height = `${CURSOR_SIZE}px`;

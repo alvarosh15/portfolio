@@ -1,29 +1,48 @@
 ---
 import { CursorIcon } from "../constants/cursor-icons";
 
-const { title, description, link, github, image } = Astro.props;
+interface Props {
+  title: string;
+  description: string;
+  link?: string;
+  github?: string;
+  image: string;
+  imageWidth: number;
+  imageHeight: number;
+}
+
+const {
+  title,
+  description,
+  link,
+  github,
+  image,
+  imageWidth,
+  imageHeight,
+} = Astro.props;
 ---
 
-<div
-  class="flex flex-col group h-[32rem] overflow-hidden rounded-3xl bg-dark-brown-bg p-4 gap-y-2"
+<article
+  class="flex flex-col group overflow-hidden rounded-2xl bg-dark-brown-bg p-4 gap-y-3"
 >
-  <h2 class="text-3xl">{title}</h2>
-  <h3 class="text-xl text-dark-brown-text">
+  <h3 class="text-2xl sm:text-3xl">{title}</h3>
+  <p class="text-lg sm:text-xl text-dark-brown-text">
     {description}
-  </h3>
-  <div class="flex flex-row gap-x-4">
+  </p>
+  <div class="flex flex-wrap gap-3">
     {
       github && (
         <a
           href={github}
           target="_blank"
           rel="noopener noreferrer"
-          class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-xl py-2 px-4
+          class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-lg sm:text-xl py-2 px-4
   hover:text-dark-brown-bg hover:border-dark-brown-bg hover:bg-dark-brown-text"
           data-cursor-text="View Code"
           data-cursor-icon={CursorIcon.Github}
+          aria-label={`View ${title} source code on GitHub`}
         >
-          Github
+          GitHub
         </a>
       )
     }
@@ -33,10 +52,11 @@ const { title, description, link, github, image } = Astro.props;
           href={link}
           target="_blank"
           rel="noopener noreferrer"
-          class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-xl py-2 px-4
+          class="text-dark-brown-text border-dark-brown-text size-fit rounded-full border text-lg sm:text-xl py-2 px-4
     hover:text-dark-brown-bg hover:border-dark-brown-bg hover:bg-dark-brown-text"
           data-cursor-text="Visit Project"
           data-cursor-icon={CursorIcon.External}
+          aria-label={`Visit ${title}`}
         >
           Visit →
         </a>
@@ -46,6 +66,10 @@ const { title, description, link, github, image } = Astro.props;
   <img
     src={image}
     alt=`${title} screenshot`
-    class="w-full h-full object-cover rounded-3xl"
+    width={imageWidth}
+    height={imageHeight}
+    loading="lazy"
+    decoding="async"
+    class="w-full aspect-[16/10] object-cover rounded-2xl"
   />
-</div>
+</article>

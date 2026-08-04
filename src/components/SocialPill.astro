@@ -1,12 +1,14 @@
 ---
 interface Props {
   href: string;
+  "aria-label"?: string;
   "data-cursor-text"?: string;
   "data-cursor-icon"?: string;
 }
 
 const {
   href,
+  "aria-label": ariaLabel,
   "data-cursor-text": dataCursorText,
   "data-cursor-icon": dataCursorIcon,
 } = Astro.props;
@@ -16,6 +18,7 @@ const {
   class="rounded-full border text-dark-brown-text border-dark-brown-text size-fit flex justify-center items-center gap-x-2 text-xl py-2 px-4
       hover:text-dark-brown-bg hover:border-dark-brown-bg hover:bg-dark-brown-text"
   href={href}
+  aria-label={ariaLabel}
   target="_blank"
   rel="noopener noreferrer"
   data-cursor-text={dataCursorText}

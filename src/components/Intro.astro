@@ -8,27 +8,20 @@ import Mail from "../components/icons/Mail.astro";
 import X from "../components/icons/X.astro";
 ---
 
-<Section class="pt-8 pb-4">
-  <h1 class="text-5xl flex flex-row gap-x-4 pb-4">
-    Hey, I'm Alvaro <div class="flex justify-center items-center">
-      <a
-        href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="flex justify-center items-center"
-      >
-      </a>
-    </div>
+<Section class="pt-10 pb-6">
+  <h1 class="text-4xl sm:text-5xl pb-4">
+    Hey, I'm Alvaro
   </h1>
-  <h2 class="text-2xl opacity-80 text-wrap pb-4">
+  <p class="text-xl sm:text-2xl opacity-80 text-wrap pb-4">
     A software engineer with a passion for <span>learning and creating</span>,
     with a special love for full-stack development and AI. I’m always looking
     for new challenges and opportunities to learn and grow.
-  </h2>
+  </p>
 
-  <nav class="flex flex-wrap gap-2">
+  <nav class="flex flex-wrap gap-2" aria-label="Social links">
     <SocialPill
       href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
+      aria-label="View LinkedIn profile"
       data-cursor-text="View LinkedIn"
       data-cursor-icon={CursorIcon.LinkedIn}
     >
@@ -36,6 +29,7 @@ import X from "../components/icons/X.astro";
     </SocialPill>
     <SocialPill
       href="https://github.com/alvarosh15"
+      aria-label="View GitHub profile"
       data-cursor-text="View GitHub"
       data-cursor-icon={CursorIcon.Github}
     >
@@ -43,6 +37,7 @@ import X from "../components/icons/X.astro";
     </SocialPill>
     <SocialPill
       href="https://x.com/alvarombt"
+      aria-label="View X profile"
       data-cursor-text="View X"
       data-cursor-icon={CursorIcon.X}
     >
@@ -50,6 +45,7 @@ import X from "../components/icons/X.astro";
     </SocialPill>
     <SocialPill
       href="mailto:alvaro.s.h.15@gmail.com"
+      aria-label="Send email to Alvaro"
       data-cursor-text="Send Email"
       data-cursor-icon={CursorIcon.Mail}
     >
