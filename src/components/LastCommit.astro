@@ -1,0 +1,34 @@
+---
+// The site's latest commit, read at build time, shown as a terminal.
+import { execSync } from "node:child_process";
+
+let commit = "";
+try {
+  commit = execSync('git log -1 --format="%h %s (%cd)" --date=short', { encoding: "utf8" }).trim();
+} catch {
+  commit = "fatal: not a git repository";
+}
+---
+
+<div class="font-mono">
+  <p><span class="text-ink">$</span> git log -1 --oneline</p>
+  <p class="text-ink">{commit} <span class="cursor inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-ink"></span></p>
+</div>
+
+<style>
+  .cursor {
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+// The site's header on every page: whatever goes in the slot sits in the middle column,
+// with the pixel park on both sides (see src/scripts/pixel-people.ts).
+import type { ParkMode } from "../scripts/pixel-people";
+
+interface Props {
+  /** What the park is up to: its usual hobbies, reading on blog pages, or lost on the 404. */
+  mode?: ParkMode;
+}
+
+const { mode = "home" } = Astro.props;
+const home = mode === "home";
+---
+
+<header
+  data-park={mode}
+  class:list={[
+    "mx-auto w-full max-w-[1600px] overflow-x-clip px-6 pt-20 [--px:3px] sm:pt-32 lg:[--px:4px]",
+    home ? "pb-16 sm:pb-24" : "pb-12",
+  ]}
+>
+  <div
+    data-people-stage
+    class="relative grid grid-cols-2 gap-y-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,42rem)_minmax(0,1fr)] lg:gap-x-10"
+  >
+    <div
+      data-people-text
+      class:list={[
+        // Same minimum height on every page, so the park doesn't move when navigating.
+        "col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:min-h-[36rem]",
+        !home && "lg:flex lg:flex-col lg:justify-center",
+      ]}
+    >
+      <slot />
+    </div>
+
+    <!-- The park and anything scenes leave in it persist between pages (see Layout's ClientRouter). -->
+    <div
+      data-people-zone="left"
+      transition:persist="park-left"
+      class="relative h-24 lg:col-start-1 lg:row-start-1 lg:h-auto"
+    >
+    </div>
+    <div
+      data-people-zone="right"
+      transition:persist="park-right"
+      class="relative h-24 lg:col-start-3 lg:row-start-1 lg:h-auto"
+    >
+    </div>
+    <div data-people-layer transition:persist="park-layer" class="pointer-events-none absolute inset-0"></div>
+  </div>
+</header>
+
+<script>
+  import { mountPixelPeople, type ParkMode } from "../scripts/pixel-people";
+
+  // Runs on the first load and after every client-side navigation.
+  document.addEventListener("astro:page-load", () => {
+    const park = document.querySelector<HTMLElement>("[data-park]");
+    if (park) mountPixelPeople(park, park.dataset.park as ParkMode);
+  });
+</script>

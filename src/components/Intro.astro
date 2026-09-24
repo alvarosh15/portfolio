@@ -1,56 +1,73 @@
 ---
-import SocialPill from "../components/SocialPill.astro";
-import { CursorIcon } from "../constants/cursor-icons";
-import LinkedIn from "../components/icons/LinkedIn.astro";
-import Section from "../components/Section.astro";
-import GitHub from "../components/icons/GitHub.astro";
-import Mail from "../components/icons/Mail.astro";
-import X from "../components/icons/X.astro";
+import Park from "./Park.astro";
+import { formatDate, getPosts } from "../data/posts";
+
+const links = [
+  { label: "GitHub", href: "https://github.com/alvarosh15" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/alvaro-sanchez-hernandez/" },
+  { label: "X", href: "https://x.com/alvarombt" },
+  { label: "Email", href: "mailto:alvaro.s.h.15@gmail.com" },
+  { label: "Writing", href: "/blog/" },
+];
+
+const latest = (await getPosts()).slice(0, 3);
+const link =
+  "underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-ink";
+
+// Words in the intro that trigger a scene in the park (see src/scripts/scenes.ts).
+const scene =
+  "cursor-pointer underline decoration-muted/40 decoration-dotted decoration-2 underline-offset-[0.2em] transition-colors hover:decoration-ink";
 ---
 
-<Section class="pt-10 pb-6">
-  <h1 class="text-4xl sm:text-5xl pb-4">
-    Hey, I'm Alvaro
-  </h1>
-  <p class="text-xl sm:text-2xl opacity-80 text-wrap pb-4">
-    A software engineer with a passion for <span>learning and creating</span>,
-    with a special love for full-stack development and AI. I’m always looking
-    for new challenges and opportunities to learn and grow.
+<Park>
+  <h1 class="text-sm font-medium">Alvaro Sanchez</h1>
+
+  <p class="mt-6 text-xl leading-relaxed text-pretty sm:text-2xl sm:leading-relaxed">
+    I'm a software engineer at <button type="button" data-scene="google" class={scene}>Google</button>,{" "}
+    working on <button type="button" data-scene="virustotal" class={scene}>VirusTotal</button>. I studied
+    the double degree in <button type="button" data-scene="math" class={scene}>Mathematics</button> and{" "}
+    <button type="button" data-scene="cs" class={scene}>Computer Science</button> at the University of
+    Málaga, part of its first graduating class, and kept going with a master's
+    in <button type="button" data-scene="ai" class={scene}>Artificial Intelligence</button> and Software Engineering and a diploma in{" "}
+    <button type="button" data-scene="reverse" class={scene}>reverse engineering</button> and malware intelligence. Before Google I built full-stack
+    apps with React and Django at{" "}
+    <button type="button" data-scene="space" class={scene}>Indra Espacio</button>.{" "}
+    <span class="text-muted">
+      These days I mostly care about full-stack work, AI and security, and
+      building small things I wish existed.
+    </span>
   </p>
 
-  <nav class="flex flex-wrap gap-2" aria-label="Social links">
-    <SocialPill
-      href="https://www.linkedin.com/in/alvaro-sanchez-hernandez/"
-      aria-label="View LinkedIn profile"
-      data-cursor-text="View LinkedIn"
-      data-cursor-icon={CursorIcon.LinkedIn}
-    >
-      <LinkedIn />
-    </SocialPill>
-    <SocialPill
-      href="https://github.com/alvarosh15"
-      aria-label="View GitHub profile"
-      data-cursor-text="View GitHub"
-      data-cursor-icon={CursorIcon.Github}
-    >
-      <GitHub />
-    </SocialPill>
-    <SocialPill
-      href="https://x.com/alvarombt"
-      aria-label="View X profile"
-      data-cursor-text="View X"
-      data-cursor-icon={CursorIcon.X}
-    >
-      <X />
-    </SocialPill>
-    <SocialPill
-      href="mailto:alvaro.s.h.15@gmail.com"
-      aria-label="Send email to Alvaro"
-      data-cursor-text="Send Email"
-      data-cursor-icon={CursorIcon.Mail}
-    >
-      <Mail />
-      alvaro.s.h.15@gmail.com
-    </SocialPill>
-  </nav>
-</Section>
+  <ul data-people-links class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm" aria-label="Links">
+    {
+      links.map(({ label, href }) => (
+        <li>
+          <a
+            href={href}
+            {...(href.startsWith("http") && { target: "_blank", rel: "noopener noreferrer" })}
+            class:list={["text-muted", link]}
+          >
+            {label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    latest.length > 0 && (
+      <ul data-people-links class="mt-6 space-y-1 text-sm" aria-label="Latest writing">
+        {latest.map((post) => (
+          <li class="flex w-fit gap-4">
+            <time datetime={post.data.date.toISOString()} class="text-muted">
+              {formatDate(post.data.date)}
+            </time>
+            <a href={`/blog/${post.id}/`} class={link}>
+              {post.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Park>

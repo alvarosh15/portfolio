@@ -1,7 +1,114 @@
 @import "tailwindcss";
 
 @theme {
-  --color-light-brown-bg: #ffffff;
-  --color-dark-brown-bg: #73b6eb;
-  --color-dark-brown-text: #195695;
+  --font-sans: "Onest Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #ffffff;
+  --color-ink: #111111;
+  --color-muted: #737373;
+  --color-line: #e7e7e7;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Pages with and without a scrollbar stay the same width, so the park doesn't shift. */
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+}
+
+/* Blog posts: Markdown rendered inside <article class="post">. */
+@layer components {
+  .post {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .post > * + * {
+    margin-top: 1.25em;
+  }
+
+  .post h2 {
+    margin-top: 2.5em;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .post h3 {
+    margin-top: 2em;
+    font-weight: 500;
+  }
+
+  .post a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-line);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 150ms;
+  }
+
+  .post a:hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  .post :not(pre) > code {
+    border-radius: 0.25rem;
+    background-color: #f5f5f5;
+    padding: 0.125em 0.375em;
+    font-size: 0.875em;
+  }
+
+  .post pre {
+    overflow-x: auto;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  .post ul {
+    list-style: disc;
+    padding-left: 1.25em;
+  }
+
+  .post ol {
+    list-style: decimal;
+    padding-left: 1.25em;
+  }
+
+  .post li + li {
+    margin-top: 0.4em;
+  }
+
+  .post blockquote {
+    border-left: 2px solid var(--color-line);
+    padding-left: 1em;
+    color: var(--color-muted);
+  }
+
+  .post img {
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+  }
 }

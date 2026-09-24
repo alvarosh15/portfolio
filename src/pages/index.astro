@@ -1,19 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Intro from "../components/Intro.astro";
-import AboutMe from "../components/AboutMe.astro";
-import Projects from "../components/Projects.astro";
-import Section from "../components/Section.astro";
+import ProjectsGrid from "../components/ProjectsGrid.astro";
+import Footer from "../components/Footer.astro";
 ---
 
-<Layout title="Alvaro Sanchez - Software Engineer">
-  <main class="px-6">
+<Layout title="Alvaro Sanchez - SWE">
+  <main>
     <Intro />
-    <AboutMe />
-    <Projects />
-    <Section id="blog" class="py-4">
-      <h2 class="text-3xl pb-10">Blog</h2>
-      <h3 class="text-xl opacity-80 text-wrap pb-4">Coming soon...</h3>
-    </Section>
+    <ProjectsGrid />
   </main>
+  <Footer />
 </Layout>

@@ -1,40 +1,41 @@
-export const projects = [
+import type { ImageMetadata } from "astro";
+import latte from "../assets/projects/latte.png";
+import litscan from "../assets/projects/litscan.png";
+import willitbang from "../assets/projects/willitbang.png";
+
+export interface Project {
+  title: string;
+  description: string;
+  /** When the project started, as YYYY-MM. Projects are shown newest first. */
+  date: string;
+  link?: string;
+  github?: string;
+  image: ImageMetadata;
+}
+
+export const projects: Project[] = [
   {
-    title: "Text2Math",
+    title: "Will It Bang?",
     description:
-      "A way to input text in LaTeX or AsciiMath and get a PNG image to share across social media.",
-    link: "https://text2math.vercel.app/",
-    github: "https://github.com/alvarosh15/text2math",
-    image: "/projects/text2math.png",
-    imageWidth: 1614,
-    imageHeight: 1046,
+      "Write a post and let Jev decide if it's a banger or a flop, scored on hook, shareability and more.",
+    date: "2026-09",
+    link: "https://will-it-bang.vercel.app/",
+    image: willitbang,
   },
   {
-    title: "CleanText and MiniMarkdown",
+    title: "latte",
     description:
-      "A minimalist Markdown web editor and my own parser for a subset of Markdown.",
-    github: "https://github.com/alvarosh15/cleantext",
-    image: "/projects/cleantext.png",
-    imageWidth: 1902,
-    imageHeight: 1227,
+      "Thread scheduler for X that runs 24/7 on a Raspberry Pi: React, Hono and SQLite, publishing whatever is due.",
+    date: "2026-07",
+    image: latte,
   },
   {
-    title: "Amazon Last Mile Routing Challenge Dashboard",
+    title: "Lit Scan",
     description:
-      'Full-stack application for visualizing and managing data from the "Amazon Last Mile Routing Research Challenge" dataset. My end-of-degree project marked with top marks.',
-    github: "https://github.com/alvarosh15/dashboard",
-    image: "/projects/dashboard.png",
-    imageWidth: 3248,
-    imageHeight: 1950,
+      "Rerender visualizer for Lit web components, inspired by React Scan. Flashes every rerender and keeps a live counter and FPS meter.",
+    date: "2026-05",
+    link: "https://www.lit-scan.com/",
+    github: "https://github.com/alvarosh15/lit-scan",
+    image: litscan,
   },
-  {
-    title: "MalwareAI",
-    description:
-      "An AI-powered platform for analyzing and decompiling potentially malicious files.",
-    link: "https://malwareai.vercel.app",
-    github: "https://github.com/alvarosh15/malwareai",
-    image: "/projects/malwareai.png",
-    imageWidth: 3228,
-    imageHeight: 1948,
-  },
-] as const;
+].sort((a, b) => b.date.localeCompare(a.date));

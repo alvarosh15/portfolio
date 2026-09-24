@@ -1,0 +1,22 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Park from "../../components/Park.astro";
+import PostList from "../../components/PostList.astro";
+import Footer from "../../components/Footer.astro";
+import { getPosts } from "../../data/posts";
+
+const posts = await getPosts();
+---
+
+<Layout title="Writing · Alvaro Sanchez" description="Notes by Alvaro Sanchez on the things he builds.">
+  <Park mode="reading">
+    <a href="/" class="text-sm font-medium">Alvaro Sanchez</a>
+    <h1 class="mt-6 text-xl leading-relaxed text-pretty sm:text-2xl sm:leading-relaxed">
+      Writing. <span class="text-muted">Notes on the things I build and what I learn along the way.</span>
+    </h1>
+    <div class="mt-8">
+      <PostList posts={posts} />
+    </div>
+  </Park>
+  <Footer />
+</Layout>

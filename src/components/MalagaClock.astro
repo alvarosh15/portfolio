@@ -1,0 +1,124 @@
+---
+// Local time and live weather in Málaga, with a tiny pixel sky.
+---
+
+<div class="flex items-center gap-3 [--px:2px]">
+  <div data-sky class="shrink-0" aria-hidden="true"></div>
+  <div>
+    <p data-clock class="text-ink">Málaga</p>
+    <p data-mood></p>
+  </div>
+</div>
+
+<script>
+  import { compose, effects, paint, svgFor, toPaths, type Grid, type Layer } from "../scripts/sprites";
+
+  const sky = document.querySelector<HTMLElement>("[data-sky]");
+  const clock = document.querySelector<HTMLElement>("[data-clock]");
+  const mood = document.querySelector<HTMLElement>("[data-mood]");
+
+  if (sky && clock && mood) {
+    const W = 36;
+    const H = 20;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sky.innerHTML = svgFor(W, H);
+
+    const parts = (options: Intl.DateTimeFormatOptions) =>
+      new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", ...options }).format(new Date());
+
+    const moodFor = (hour: number, weekend: boolean) => {
+      if (hour < 7) return "Probably asleep.";
+      if (hour < 9) return "Probably on the first coffee.";
+      if (hour < 18) return weekend ? "Probably outside, or building something." : "Probably at work.";
+      return "Probably building small things.";
+    };
+
+    // Open-Meteo weather codes, grouped into what the sky can draw.
+    type Sky = "clear" | "cloudy" | "fog" | "rain" | "snow" | "storm";
+    const describe = (code: number): [Sky, string] => {
+      if (code === 0) return ["clear", "clear"];
+      if (code <= 2) return ["cloudy", "partly cloudy"];
+      if (code === 3) return ["cloudy", "cloudy"];
+      if (code <= 48) return ["fog", "foggy"];
+      if (code <= 67 || (code >= 80 && code <= 82)) return ["rain", "raining"];
+      if (code <= 77 || code === 85 || code === 86) return ["snow", "snowing"];
+      return ["storm", "stormy"];
+    };
+
+    let weather: Sky = "clear";
+    let summary = "";
+    const hour = () => Number(parts({ hour: "2-digit", hourCycle: "h23" }));
+    const isDay = () => hour() >= 7 && hour() < 20;
+
+    const updateText = () => {
+      const weekend = ["Sat", "Sun"].includes(parts({ weekday: "short" }));
+      clock.textContent = `${parts({ hour: "2-digit", minute: "2-digit", hourCycle: "h23" })} in Málaga${summary}`;
+      mood.textContent = moodFor(hour(), weekend);
+    };
+
+    // Rain and snow fall in fixed columns, each with its own offset.
+    const drops = Array.from({ length: 9 }, (_, i) => ({ x: 4 + i * 3.5, offset: Math.random() * H }));
+    const stars = [
+      [14, 3],
+      [22, 6],
+      [30, 2],
+      [26, 12],
+    ];
+
+    const draw = (t: number) => {
+      const layers: Layer[] = [];
+      const cloudy = weather !== "clear";
+      if (isDay()) layers.push([effects.sun, 2, 2]);
+      else {
+        layers.push([effects.moon, 3, 2]);
+        if (!cloudy) {
+          for (const [x, y] of stars) layers.push([(t / 400 + x) % 6 < 1 ? ["."] : ["#"], x, y]);
+        }
+      }
+      if (cloudy) {
+        const drift = reducedMotion ? 0 : (t / 250) % (W + 14);
+        layers.push([effects.cloud, Math.round(drift) - 14, 3]);
+        layers.push([effects.cloud, 18, weather === "fog" ? 10 : 1]);
+      }
+      if (weather === "rain" || weather === "storm" || weather === "snow") {
+        const art: Grid = weather === "snow" ? effects.snowflake : effects.raindrop;
+        const speed = weather === "snow" ? 180 : 60;
+        for (const drop of drops) {
+          const y = reducedMotion ? drop.offset : (t / speed + drop.offset) % (H - 7);
+          layers.push([art, Math.round(drop.x), 7 + Math.round(y)]);
+        }
+      }
+      paint(sky, toPaths(compose(layers, W, H)));
+    };
+
+    updateText();
+    draw(0);
+    setInterval(updateText, 30_000);
+
+    fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=36.7213&longitude=-4.4214&current=temperature_2m,weather_code&timezone=Europe%2FMadrid",
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        const [kind, text] = describe(data.current.weather_code);
+        weather = kind;
+        summary = ` · ${Math.round(data.current.temperature_2m)}°C, ${text}`;
+        updateText();
+        draw(0);
+      })
+      .catch(() => {}); // Without weather it just shows the time.
+
+    if (!reducedMotion) {
+      let visible = false;
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) requestAnimationFrame(loop);
+      }).observe(sky);
+      const loop = (t: number) => {
+        if (!visible) return;
+        draw(t);
+        requestAnimationFrame(loop);
+      };
+    }
+  }
+</script>

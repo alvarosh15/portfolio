@@ -1,0 +1,89 @@
+---
+import { Image } from "astro:assets";
+import { projects } from "../data/projects";
+
+const month = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+const link =
+  "text-muted underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-ink";
+---
+
+<section
+  id="projects"
+  aria-labelledby="projects-title"
+  class="mx-auto w-full max-w-[1600px] px-6"
+>
+  <h2 id="projects-title" class="sr-only">Projects</h2>
+
+  <!-- The newest project spans the full width; the rest go two per row below it. -->
+  <ul class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+    {
+      projects.map((project, index) => {
+        const featured = index === 0;
+        const href = project.link ?? project.github;
+        // Projects without a link still show their screenshot, just not as a link.
+        const Frame = href ? "a" : "div";
+        return (
+          <li class:list={["flex flex-col gap-3", featured && "lg:col-span-2"]}>
+            <Frame
+              {...(href && {
+                href,
+                target: "_blank",
+                rel: "noopener noreferrer",
+                "aria-label": `Open ${project.title}`,
+              })}
+              class:list={[
+                "block aspect-[16/10] overflow-hidden rounded-2xl border border-line bg-neutral-50 lg:aspect-auto",
+                featured ? "lg:h-[clamp(20rem,36vw,40rem)]" : "lg:h-[clamp(16rem,24vw,30rem)]",
+              ]}
+            >
+              <Image
+                src={project.image}
+                alt={`Screenshot of ${project.title}`}
+                widths={[640, 960, 1440, 1920, 2880]}
+                sizes={featured ? "100vw" : "(min-width: 1024px) 50vw, 100vw"}
+                loading={index < 3 ? "eager" : "lazy"}
+                class="size-full object-cover object-top"
+              />
+            </Frame>
+
+            <div class="flex items-baseline justify-between gap-4 text-sm">
+              <div class="min-w-0">
+                <h3 class="font-medium">
+                  {project.title}
+                  <time datetime={project.date} class="ml-2 font-normal text-muted">
+                    {month.format(new Date(`${project.date}-01`))}
+                  </time>
+                </h3>
+                <p class="text-muted text-pretty">{project.description}</p>
+              </div>
+              <div class="flex shrink-0 gap-4">
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class={link}
+                    aria-label={`Visit ${project.title}`}
+                  >
+                    Visit
+                  </a>
+                )}
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class={link}
+                    aria-label={`Source code of ${project.title}`}
+                  >
+                    Code
+                  </a>
+                )}
+              </div>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>

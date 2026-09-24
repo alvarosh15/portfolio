@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@fontsource-variable/onest": "^5.1.0",
-    "@fontsource-variable/playfair-display": "^5.1.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@vercel/analytics": "^2.0.1",
     "astro": "^7.1.6",
     "tailwindcss": "^4.3.3"
   },

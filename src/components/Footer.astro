@@ -1,0 +1,247 @@
+---
+import LastCommit from "./LastCommit.astro";
+import MalagaClock from "./MalagaClock.astro";
+
+// The sorting animation is hidden for now; set to true to bring it back.
+const showSorting = false;
+---
+
+<footer transition:persist="footer" class="mx-auto mt-auto w-full max-w-5xl px-6 pt-32 pb-10">
+  {
+    showSorting && (
+      <>
+        <button
+          type="button"
+          id="sorter"
+          class="flex h-24 w-full cursor-pointer items-end gap-px sm:h-32 sm:gap-[2px]"
+          aria-label="Shuffle new numbers and sort them with a random algorithm"
+        />
+        <p aria-live="polite" class="mt-4 text-xs text-muted">
+          <span id="sorter-status">Shuffling</span>
+        </p>
+      </>
+    )
+  }
+
+  <div
+    class:list={[
+      "flex flex-wrap items-center justify-between gap-6 text-xs text-muted",
+      showSorting && "mt-10 border-t border-line pt-6",
+    ]}
+  >
+    <LastCommit />
+    <div class="sm:ml-auto">
+      <MalagaClock />
+    </div>
+  </div>
+</footer>
+
+<script>
+  type Op = { kind: "compare" | "swap"; i: number; j: number };
+  type Algorithm = {
+    name: string;
+    run: (values: number[]) => Op[];
+    /** Relative chance of being picked. Defaults to 1. */
+    weight?: number;
+    /** Custom status once finished. */
+    doneText?: (label: string) => string;
+  };
+
+  const IDLE = "#dcdcdc";
+  const ACTIVE = "#111111";
+  const DONE = "#111111";
+  const ANIMATION_MS = 9000;
+
+  // Each algorithm sorts a copy and records every compare/swap so we can replay it.
+  function record(values: number[], sort: (a: number[], ops: Op[]) => void) {
+    const ops: Op[] = [];
+    sort([...values], ops);
+    return ops;
+  }
+
+  function swap(a: number[], ops: Op[], i: number, j: number) {
+    [a[i], a[j]] = [a[j], a[i]];
+    ops.push({ kind: "swap", i, j });
+  }
+
+  const algorithms: Algorithm[] = [
+    {
+      name: "bubble sort",
+      run: (values) =>
+        record(values, (a, ops) => {
+          for (let end = a.length - 1; end > 0; end--) {
+            let swapped = false;
+            for (let i = 0; i < end; i++) {
+              ops.push({ kind: "compare", i, j: i + 1 });
+              if (a[i] > a[i + 1]) {
+                swap(a, ops, i, i + 1);
+                swapped = true;
+              }
+            }
+            if (!swapped) break;
+          }
+        }),
+    },
+    {
+      name: "insertion sort",
+      run: (values) =>
+        record(values, (a, ops) => {
+          for (let i = 1; i < a.length; i++) {
+            for (let j = i; j > 0; j--) {
+              ops.push({ kind: "compare", i: j - 1, j });
+              if (a[j - 1] <= a[j]) break;
+              swap(a, ops, j - 1, j);
+            }
+          }
+        }),
+    },
+    {
+      name: "selection sort",
+      run: (values) =>
+        record(values, (a, ops) => {
+          for (let i = 0; i < a.length - 1; i++) {
+            let min = i;
+            for (let j = i + 1; j < a.length; j++) {
+              ops.push({ kind: "compare", i: min, j });
+              if (a[j] < a[min]) min = j;
+            }
+            if (min !== i) swap(a, ops, i, min);
+          }
+        }),
+    },
+    {
+      name: "quicksort",
+      run: (values) =>
+        record(values, (a, ops) => {
+          const quick = (lo: number, hi: number) => {
+            if (lo >= hi) return;
+            const pivot = a[hi];
+            let store = lo;
+            for (let i = lo; i < hi; i++) {
+              ops.push({ kind: "compare", i, j: hi });
+              if (a[i] < pivot) swap(a, ops, i, store++);
+            }
+            swap(a, ops, store, hi);
+            quick(lo, store - 1);
+            quick(store + 1, hi);
+          };
+          quick(0, a.length - 1);
+        }),
+    },
+  ];
+
+  // Joke algorithm: trust that a higher power already sorted the list. O(1).
+  algorithms.push({
+    name: "intelligent design sort",
+    run: () => [],
+    weight: 0.4,
+    doneText: (label) =>
+      `${label}. Already in the order a higher power intended, O(1)`,
+  });
+
+  function pickAlgorithm() {
+    const total = algorithms.reduce((sum, a) => sum + (a.weight ?? 1), 0);
+    let roll = Math.random() * total;
+    return algorithms.find((a) => (roll -= a.weight ?? 1) < 0) ?? algorithms[0];
+  }
+
+  const container = document.getElementById("sorter");
+  const status = document.getElementById("sorter-status");
+
+  // Each click shuffles new numbers and sorts them again; older runs stop drawing.
+  let run = 0;
+
+  function play(container: HTMLElement, status: HTMLElement, waitForView: boolean) {
+    const id = ++run;
+    container.replaceChildren();
+    const barCount = Math.max(24, Math.min(96, Math.floor(container.clientWidth / 10)));
+    const values = Array.from({ length: barCount }, () => Math.random());
+    const algorithm = pickAlgorithm();
+    const ops = algorithm.run(values);
+
+    const bars = values.map((value) => {
+      const bar = document.createElement("span");
+      bar.className = "block flex-1 rounded-t-[2px]";
+      bar.style.height = `${8 + value * 92}%`;
+      bar.style.backgroundColor = IDLE;
+      container.appendChild(bar);
+      return bar;
+    });
+
+    const label = `${barCount} random numbers, ${algorithm.name}`;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const finish = () => {
+      status.textContent = `${algorithm.doneText?.(label) ?? `Sorted ${label}`}. Click to shuffle again`;
+      bars.forEach((bar) => {
+        bar.style.transition = `background-color 300ms ease ${reducedMotion ? 0 : bars.indexOf(bar) * 12}ms`;
+        bar.style.backgroundColor = DONE;
+      });
+    };
+
+    const applySwap = ({ i, j }: Op) => {
+      const heightI = bars[i].style.height;
+      bars[i].style.height = bars[j].style.height;
+      bars[j].style.height = heightI;
+    };
+
+    if (reducedMotion) {
+      ops.forEach((op) => op.kind === "swap" && applySwap(op));
+      finish();
+      return;
+    }
+
+    status.textContent = `Sorting ${label}`;
+    let cursor = 0;
+    let highlighted: HTMLElement[] = [];
+    let lastTime = 0;
+    // Spread all operations over ANIMATION_MS, whatever the algorithm's cost.
+    const opsPerMs = ops.length / ANIMATION_MS;
+
+    const step = (time: number) => {
+      if (id !== run) return;
+      const elapsed = lastTime ? time - lastTime : 16;
+      lastTime = time;
+      const target = Math.min(ops.length, cursor + Math.max(1, Math.round(elapsed * opsPerMs)));
+
+      highlighted.forEach((bar) => (bar.style.backgroundColor = IDLE));
+      highlighted = [];
+
+      for (; cursor < target; cursor++) {
+        const op = ops[cursor];
+        if (op.kind === "swap") applySwap(op);
+      }
+
+      const last = ops[cursor - 1];
+      if (last) {
+        highlighted = [bars[last.i], bars[last.j]];
+        highlighted.forEach((bar) => (bar.style.backgroundColor = ACTIVE));
+      }
+
+      if (cursor < ops.length) {
+        requestAnimationFrame(step);
+      } else {
+        highlighted.forEach((bar) => (bar.style.backgroundColor = IDLE));
+        finish();
+      }
+    };
+
+    if (!waitForView) {
+      requestAnimationFrame(step);
+      return;
+    }
+    // Start only when the footer is on screen, so the sort is actually seen.
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        requestAnimationFrame(step);
+      }
+    });
+    observer.observe(container);
+  }
+
+  if (container && status) {
+    play(container, status, true);
+    container.addEventListener("click", () => play(container, status, false));
+  }
+</script>

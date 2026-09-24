@@ -1,21 +1,25 @@
 ---
-import Header from "../components/Header.astro";
-import CursorIcons from "../components/CursorIcons.astro";
-import "../styles/global.css";
 import "@fontsource-variable/onest";
-import "@fontsource-variable/playfair-display";
+import { ClientRouter } from "astro:transitions";
+import Analytics from "@vercel/analytics/astro";
+import "../styles/global.css";
+import defaultImage from "../assets/og.png";
 
 interface Props {
   title: string;
   description?: string;
   image?: string;
+  /** Posts: shared as an article, with this publish date. */
+  published?: Date;
 }
 
 const {
   title,
-  description = "Portfolio of Alvaro Sanchez, a software engineer focused on full-stack development, artificial intelligence, and security-oriented projects.",
-  image = "/projects/malwareai.png",
+  description = "Portfolio of Alvaro Sanchez, a software engineer focused on full-stack development, artificial intelligence, and security.",
+  image = defaultImage.src,
+  published,
 } = Astro.props;
+
 const canonicalUrl = Astro.site
   ? new URL(Astro.url.pathname, Astro.site).toString()
   : undefined;
@@ -26,173 +30,37 @@ const socialImageUrl = Astro.site ? new URL(image, Astro.site).toString() : imag
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta property="og:type" content="website" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Alvaro Sanchez" href="/rss.xml" />
+    <meta property="og:site_name" content="Alvaro Sanchez" />
+    <meta property="og:type" content={published ? "article" : "website"} />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Alvaro Sanchez's homepage: a short bio between two pixel art parks" />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@alvarombt" />
+    <meta name="twitter:creator" content="@alvarombt" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImageUrl} />
     <title>{title}</title>
+    <!-- Navigate without full reloads so the park and footer persist between pages. -->
+    <ClientRouter />
   </head>
 
-  <body>
-    <div
-      class="cursor rounded-full flex items-center justify-center gap-1 transition-[width,height,padding] duration-150 text-white"
-      id="cursor"
-    >
-      <span
-        id="cursor-icon"
-        class="flex items-center opacity-0 transition-opacity duration-150"
-      ></span>
-      <span
-        id="cursor-text"
-        class="opacity-0 text-white transition-opacity duration-150 whitespace-nowrap"
-      ></span>
-    </div>
-
-    <CursorIcons />
-
-    <Header />
+  <body class="flex min-h-screen flex-col bg-paper font-sans text-ink antialiased">
     <slot />
+    <Analytics />
   </body>
 </html>
-<style is:global>
-  :root {
-    color-scheme: light;
-    --cursor-size: 18px;
-  }
-  html {
-    font-family:
-      "Playfair Display Variable", "Onest Variable", system-ui, sans-serif;
-    scroll-behavior: smooth;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-  }
-
-  body {
-    background-color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    cursor: none;
-  }
-
-  a,
-  button {
-    cursor: none;
-  }
-
-  a:focus-visible,
-  button:focus-visible {
-    outline: 3px solid #ec735b;
-    outline-offset: 4px;
-    border-radius: 9999px;
-  }
-
-  .cursor {
-    position: fixed;
-    pointer-events: none;
-    background-color: #ec735b;
-    z-index: 1000;
-    width: var(--cursor-size);
-    height: var(--cursor-size);
-    padding: 0;
-    opacity: 0;
-  }
-
-  @media (pointer: coarse) {
-    body,
-    a,
-    button {
-      cursor: auto;
-    }
-    .cursor {
-      display: none;
-    }
-  }
-</style>
-<script>
-  const cursor = document.getElementById("cursor");
-  const cursorIcon = document.getElementById("cursor-icon");
-  const cursorText = document.getElementById("cursor-text");
-  const CURSOR_SIZE = parseInt(
-    getComputedStyle(document.documentElement).getPropertyValue(
-      "--cursor-size",
-    ),
-  );
-  const CURSOR_HALF = CURSOR_SIZE / 2;
-  const CURSOR_PADDING_Y = CURSOR_SIZE * 0.5;
-  const CURSOR_PADDING_X = CURSOR_SIZE;
-
-  document.addEventListener("mousemove", (e) => {
-    if (cursor) {
-      cursor.style.opacity = "1";
-      cursor.style.transform = `translate(${e.clientX - CURSOR_HALF}px, ${e.clientY - CURSOR_HALF}px)`;
-    }
-  });
-
-  document.addEventListener("mouseleave", () => {
-    if (cursor) {
-      cursor.style.opacity = "0";
-    }
-  });
-
-  document.addEventListener("mouseenter", (e) => {
-    if (cursor) {
-      cursor.style.transform = `translate(${e.clientX - CURSOR_HALF}px, ${e.clientY - CURSOR_HALF}px)`;
-      cursor.style.opacity = "1";
-    }
-  });
-
-  document.addEventListener("mouseover", (e) => {
-    if (!(e.target instanceof Element)) return;
-
-    const target = e.target.closest("[data-cursor-text]");
-    if (target && cursor && cursorText && cursorIcon) {
-      const el = target as HTMLElement;
-      cursorText.textContent = el.dataset.cursorText ?? "";
-      cursorText.classList.add("opacity-100");
-
-      const iconName = el.dataset.cursorIcon;
-      if (iconName) {
-        const iconSvg = document.querySelector(
-          `#cursor-icons [data-icon="${iconName}"]`,
-        );
-        if (iconSvg) {
-          cursorIcon.appendChild(iconSvg.cloneNode(true));
-          cursorIcon.classList.add("opacity-100");
-        }
-      }
-
-      cursor.style.width = "auto";
-      cursor.style.height = "auto";
-      cursor.style.padding = `${CURSOR_PADDING_Y}px ${CURSOR_PADDING_X}px`;
-    }
-  });
-
-  document.addEventListener("mouseout", (e) => {
-    if (!(e.target instanceof Element)) return;
-
-    const target = e.target.closest("[data-cursor-text]");
-    if (target && cursor && cursorText && cursorIcon) {
-      cursor.style.width = `${CURSOR_SIZE}px`;
-      cursor.style.height = `${CURSOR_SIZE}px`;
-      cursor.style.padding = "0";
-      cursorText.textContent = "";
-      cursorText.classList.remove("opacity-100");
-      cursorIcon.innerHTML = "";
-      cursorIcon.classList.remove("opacity-100");
-    }
-  });
-</script>
