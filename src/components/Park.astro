@@ -34,7 +34,7 @@ const home = mode === "home";
       <slot />
     </div>
 
-    <!-- The park and anything scenes leave in it persist between pages (see Layout's ClientRouter). -->
+    <!-- The park's people persist between pages (see Layout's ClientRouter); scenes are cleared. -->
     <div
       data-people-zone="left"
       transition:persist="park-left"
@@ -47,7 +47,7 @@ const home = mode === "home";
       class="relative h-24 lg:col-start-3 lg:row-start-1 lg:h-auto"
     >
     </div>
-    <div data-people-layer transition:persist="park-layer" class="pointer-events-none absolute inset-0"></div>
+    <div data-people-layer class="pointer-events-none absolute inset-0"></div>
   </div>
 </header>
 

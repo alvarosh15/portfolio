@@ -2,6 +2,8 @@
 title: "A pixel park next to my intro"
 description: "How the little people on my homepage work: sprites as strings, one animation loop, and scenes you trigger by clicking words."
 date: 2026-09-23
+# Hidden until it has been reviewed.
+draft: true
 ---
 
 My portfolio used to be a column of text and some project cards. It said the right things, but it felt like a CV. So I put a small park next to the intro: a few pixel people who read on a bench, drink coffee, play football and look at your cursor. Then I made some words in the paragraph clickable, and each one changes something in the park.

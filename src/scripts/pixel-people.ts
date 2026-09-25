@@ -473,6 +473,8 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
           actor.lastPaths = "";
         }
       }
+      // Scenes don't carry over: a new page starts with just the people.
+      director.clear();
       director.attach(root);
       resizes.disconnect();
       resizes.observe(root);

@@ -12,8 +12,6 @@ Some words in the intro are clickable, and each one starts a scene in the park: 
 
 The park stays put while you move around the site: on blog posts everyone reads, and on the 404 page they are all looking for the page you wanted.
 
-There is a [post about how it works](https://www.alvarosh.dev/blog/building-a-pixel-park/).
-
 ## Stack
 
 - [Astro](https://astro.build) with client-side navigation, so the park and the footer persist between pages

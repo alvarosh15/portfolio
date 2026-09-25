@@ -1034,6 +1034,10 @@ export function createDirector(root: HTMLElement, setup: Setup) {
   return {
     crowd,
     attach,
+    /** Ends every scene at once and puts the park back as it was. */
+    clear() {
+      for (const run of runs.values()) stop(run, 0);
+    },
     update(now: number, dt: number) {
       const unit = setup.unit();
       // Map iteration skips runs that another scene wipes mid-loop.
