@@ -7,25 +7,27 @@ const link =
 ---
 
 <Layout title="Not found · Alvaro Sanchez" description="This page doesn't exist.">
-  <Park mode="lost">
-    <a href="/" class="text-sm font-medium">Alvaro Sanchez</a>
-    <h1 class="mt-6 text-xl leading-relaxed text-pretty sm:text-2xl sm:leading-relaxed">
-      404. <span class="text-muted">This page wandered off, and the park is looking for it.</span>
-    </h1>
-    <div class="mt-8 font-mono text-sm leading-7 break-all">
-      <p><span class="text-ink">$</span> cd <span data-path>/this-page</span></p>
-      <p class="text-muted">cd: no such file or directory: <span data-path>/this-page</span></p>
-      <p><span class="text-ink">$</span> ls</p>
-      <p class="flex gap-6 text-muted">
-        <a href="/" class={link}>home</a>
-        <a href="/blog/" class={link}>writing</a>
-      </p>
-      <p>
-        <span class="text-ink">$</span>{" "}
-        <span class="cursor inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-ink"></span>
-      </p>
-    </div>
-  </Park>
+  <main>
+    <Park mode="lost">
+      <a href="/" class="text-sm font-medium">Alvaro Sanchez</a>
+      <h1 class="mt-6 text-xl leading-relaxed text-pretty sm:text-2xl sm:leading-relaxed">
+        404. <span class="text-muted">This page wandered off, and the park is looking for it.</span>
+      </h1>
+      <div class="mt-8 font-mono text-sm leading-7 break-all">
+        <p><span class="text-ink">$</span> cd <span data-path>/this-page</span></p>
+        <p class="text-muted">cd: no such file or directory: <span data-path>/this-page</span></p>
+        <p><span class="text-ink">$</span> ls</p>
+        <p class="flex gap-6 text-muted">
+          <a href="/" class={link}>home</a>
+          <a href="/blog/" class={link}>writing</a>
+        </p>
+        <p>
+          <span class="text-ink">$</span>{" "}
+          <span class="cursor inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-ink"></span>
+        </p>
+      </div>
+    </Park>
+  </main>
 </Layout>
 
 <style>
@@ -47,8 +49,9 @@ const link =
 </style>
 
 <script>
+  import { readablePath } from "../scripts/pathname";
   // The path someone tried to open, shown in the terminal.
   document.addEventListener("astro:page-load", () => {
-    for (const el of document.querySelectorAll("[data-path]")) el.textContent = decodeURI(location.pathname);
+    for (const el of document.querySelectorAll("[data-path]")) el.textContent = readablePath(location.pathname);
   });
 </script>

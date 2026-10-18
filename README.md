@@ -31,15 +31,25 @@ src/
 └── scripts/
     ├── sprites.ts       Every piece of pixel art, and the helpers that draw it
     ├── pixel-people.ts  The park's people and its animation loop
-    └── scenes.ts        What happens when you click the words in the intro
+    ├── scenes.ts        Scene lifecycle and page attachment
+    └── scenes/          Individual scenes and shared primitives
 ```
 
 ## Running it
 
 ```sh
-npm install
+nvm use          # Node 24 (or use another version manager)
+npm ci
 npm run dev      # localhost:4321
 npm run build
 npm run preview
 npm run lint
+npm run check    # strict TypeScript and Astro diagnostics
+npm test         # rendering, paths and published-post selection
+npx playwright install chromium
+npm run test:e2e # production build + desktop/mobile browser tests
 ```
+
+The browser tests mock weather and analytics, so they do not depend on those services. To use an installed Chrome instead of downloading Chromium, run `PLAYWRIGHT_CHANNEL=chrome npm run test:e2e`.
+
+Sprite frames are cached with a bounded cache. The park stops off screen and in hidden tabs, and uses on-demand updates with reduced motion. The clock is a custom element with cleanup on removal; its weather refreshes every 15 minutes while the page is visible.

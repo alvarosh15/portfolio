@@ -1,3 +1,4 @@
+import { createFrameCache } from "./frame-cache";
 import { createDirector, type Zone } from "./scenes";
 import {
   H,
@@ -219,7 +220,8 @@ interface Actor {
   nextBlink: number;
   blinkUntil: number;
   hopAt: number;
-  lastPaths: string;
+  frame: ReturnType<typeof createFrameCache>;
+  lastPaths?: ReturnType<ReturnType<typeof createFrameCache>>;
 }
 
 const HOP_MS = 220;
@@ -247,17 +249,21 @@ const castFor = (mode: ParkMode) => (def: Character) =>
 
 // One park for the whole visit: with client-side navigation its zones and scene layer persist
 // between pages, and each page load re-attaches it to the new header.
-let park: { attach: (root: HTMLElement, mode: ParkMode) => void; alive: () => boolean } | null = null;
+let park: { attach: (root: HTMLElement, mode: ParkMode) => void; alive: () => boolean; destroy: () => void } | null = null;
 
 export function mountPixelPeople(root: HTMLElement, mode: ParkMode = "home") {
   if (park?.alive()) park.attach(root, mode);
-  else park = createPark(root, mode);
+  else {
+    park?.destroy();
+    park = createPark(root, mode);
+  }
 }
 
 function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
   let root = initialRoot;
   let mode = initialMode;
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let reducedMotion = motion.matches;
   const desktop = window.matchMedia("(min-width: 1024px)");
   const zones = {
     left: root.querySelector<HTMLElement>('[data-people-zone="left"]'),
@@ -269,21 +275,29 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
     pointer.x = event.clientX;
     pointer.y = event.clientY;
     pointer.active = true;
+    if (reducedMotion) invalidate();
   };
   window.addEventListener("pointermove", trackPointer, { passive: true });
   window.addEventListener("pointerdown", trackPointer, { passive: true });
 
   const visibility = (placement: Placement) => (placement.mobile ? "block" : "hidden lg:block");
 
-  /** Pins an element's feet to its ground line. Returns the zone width left for x. */
-  const place = (el: HTMLElement, zone: HTMLElement, placement: Placement, x: number | null, lift = 0) => {
-    const width = el.offsetWidth;
-    const height = el.offsetHeight;
-    const maxX = Math.max(0, zone.clientWidth - width);
+  const geometry = new Map<HTMLElement, { width: number; height: number; zoneWidth: number; zoneHeight: number }>();
+  const transforms = new WeakMap<HTMLElement, string>();
+  const measure = (el: HTMLElement, zone: HTMLElement) => {
+    geometry.set(el, { width: el.offsetWidth, height: el.offsetHeight, zoneWidth: zone.clientWidth, zoneHeight: zone.clientHeight });
+  };
+  const place = (el: HTMLElement, _zone: HTMLElement, placement: Placement, x: number | null, lift = 0) => {
+    const { width, height, zoneWidth, zoneHeight } = geometry.get(el)!;
+    const maxX = Math.max(0, zoneWidth - width);
     const ground = desktop.matches ? placement.ground : 1;
-    const top = Math.min(Math.max(0, ground * zone.clientHeight - height), zone.clientHeight - height);
+    const top = Math.min(Math.max(0, ground * zoneHeight - height), zoneHeight - height);
     const left = x ?? placement.x * maxX;
-    el.style.transform = `translate(${Math.round(left)}px, ${Math.round(top - lift)}px)`;
+    const transform = `translate(${Math.round(left)}px, ${Math.round(top - lift)}px)`;
+    if (transforms.get(el) !== transform) {
+      el.style.transform = transform;
+      transforms.set(el, transform);
+    }
     return maxX;
   };
 
@@ -324,12 +338,11 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
       nextBlink: now + rand(1000, 5000),
       blinkUntil: 0,
       hopAt: -Infinity,
-      lastPaths: "",
+      frame: createFrameCache(W, H),
     };
   });
 
-  const lookAt = (actor: Actor) => {
-    const rect = actor.el.getBoundingClientRect();
+  const lookAt = (rect: DOMRect) => {
     const unit = rect.width / W;
     const eyesX = rect.left + unit * (OX + 8);
     const eyesY = rect.top + unit * (poseY.stand + 6);
@@ -344,13 +357,14 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
     };
   };
 
-  const update = (actor: Actor, now: number, dt: number) => {
-    if (!actor.el.offsetWidth) return; // hidden on this breakpoint
+  const update = (actor: Actor, now: number, dt: number, rect?: DOMRect) => {
+    const size = geometry.get(actor.el)!;
+    if (!size.width) return; // hidden on this breakpoint
     const { def } = actor;
-    const maxX = actor.zone.clientWidth - actor.el.offsetWidth;
+    const maxX = Math.max(0, size.zoneWidth - size.width);
     actor.x = Math.min(actor.x ?? def.x * maxX, maxX);
 
-    if (director.crowd.freeze) actor.walking = false;
+    if (director.crowd.freeze || reducedMotion) actor.walking = false;
     if (def.wander && !reducedMotion && !director.crowd.freeze) {
       if (actor.walking) {
         actor.x += WALK_SPEED * dt * actor.facing;
@@ -377,59 +391,75 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
       actor.nextBlink = now + rand(2500, 6000);
     }
 
-    const { look, near } = def.watcher ? lookAt(actor) : { look: { dx: 0, dy: 0 }, near: false };
+    const { look, near } = rect ? lookAt(rect) : { look: { dx: 0, dy: 0 }, near: false };
     const layers = def.draw({
       t: reducedMotion ? 0 : now + actor.phase,
       walking: actor.walking,
-      blink: now < actor.blinkUntil,
+      blink: !reducedMotion && now < actor.blinkUntil,
       look,
       near,
     });
     if (director.crowd.alert) layers.push([parts.alert, OX + 16, 0]);
-    const paths = toPaths(
-      compose(
-        layers,
-        W,
-        H,
-        actor.facing < 0,
-      ),
-    );
-    const key = JSON.stringify(paths);
-    if (key !== actor.lastPaths) {
+    const paths = actor.frame(layers, actor.facing < 0);
+    if (paths !== actor.lastPaths) {
       paint(actor.el, paths);
-      actor.lastPaths = key;
+      actor.lastPaths = paths;
     }
     const hop = (now - actor.hopAt) / HOP_MS;
-    const lift = hop > 0 && hop < 1 ? Math.sin(Math.PI * hop) * 3 * unit : 0;
+    const lift = !reducedMotion && hop > 0 && hop < 1 ? Math.sin(Math.PI * hop) * 3 * unit : 0;
     place(actor.el, actor.zone, def, actor.x, lift);
   };
 
-  let running = false;
+  let visible = false;
+  let raf = 0;
+  let timer = 0;
   let last = 0;
   let alerted = false;
+  let disposed = false;
+  const stop = () => {
+    cancelAnimationFrame(raf);
+    clearTimeout(timer);
+    raf = 0;
+    timer = 0;
+    last = 0;
+  };
+  const invalidate = () => {
+    if (!disposed && visible && !document.hidden && !raf) raf = requestAnimationFrame(loop);
+  };
   const loop = (now: number) => {
-    if (!running) return;
+    raf = 0;
+    if (disposed || !visible || document.hidden) return;
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
-    director.update(now, dt);
+    // Read watcher positions before the director or any actor writes to the DOM.
+    const rects = actors.map((actor) => actor.def.watcher && geometry.get(actor.el)?.width
+      ? actor.el.getBoundingClientRect() : undefined);
+    const wakeIn = director.update(now, dt);
     if (director.crowd.alert && !alerted && !reducedMotion) {
       for (const actor of actors) actor.hopAt = now + rand(0, 250);
     }
     alerted = director.crowd.alert;
-    actors.forEach((actor) => update(actor, now, dt));
-    requestAnimationFrame(loop);
+    actors.forEach((actor, i) => update(actor, now, dt, rects[i]));
+    clearTimeout(timer);
+    timer = 0;
+    if (!reducedMotion) invalidate();
+    else if (wakeIn !== null) timer = window.setTimeout(invalidate, wakeIn);
   };
 
   const readUnit = () => parseFloat(getComputedStyle(root).getPropertyValue("--px")) || 3;
   let unit = readUnit();
   const layout = () => {
     unit = readUnit();
+    // Batch layout reads, including hidden elements when the breakpoint changes.
+    for (const { el, zone } of [...propEls, ...actors]) measure(el, zone);
     placeProps();
+    invalidate();
   };
 
   const director = createDirector(root, {
     zones: { left: zones.left, right: zones.right },
     still: reducedMotion,
+    invalidate,
     cast: [...propEls.map(({ el }) => el), ...actors.map(({ el }) => el)],
     standing: actors.filter(({ def }) => !def.pose).map(({ el }) => el),
     unit: () => unit,
@@ -447,22 +477,46 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
   resizes.observe(root);
   desktop.addEventListener("change", layout);
 
-  // Only animate while the header is on screen.
   const observer = new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting && !running) {
-      running = true;
-      last = 0;
-      requestAnimationFrame(loop);
-    } else if (!entry.isIntersecting) {
-      running = false;
-    }
+    visible = entry.isIntersecting;
+    if (visible) invalidate();
+    else stop();
   });
   observer.observe(root);
+  const visibilityChanged = () => {
+    if (document.hidden) stop();
+    else invalidate();
+  };
+  const motionChanged = () => {
+    reducedMotion = motion.matches;
+    stop();
+    director.setStill(reducedMotion);
+    invalidate();
+  };
+  const scrolled = () => { if (reducedMotion) invalidate(); };
+  document.addEventListener("visibilitychange", visibilityChanged);
+  window.addEventListener("scroll", scrolled, { passive: true });
+  motion.addEventListener("change", motionChanged);
 
   return {
     alive: () => zones.left!.isConnected,
+    destroy() {
+      disposed = true;
+      stop();
+      director.destroy();
+      observer.disconnect();
+      resizes.disconnect();
+      desktop.removeEventListener("change", layout);
+      motion.removeEventListener("change", motionChanged);
+      document.removeEventListener("visibilitychange", visibilityChanged);
+      window.removeEventListener("scroll", scrolled);
+      window.removeEventListener("pointermove", trackPointer);
+      window.removeEventListener("pointerdown", trackPointer);
+    },
     /** Moves the park onto a new page's header, switching everyone's activity if needed. */
     attach(next: HTMLElement, nextMode: ParkMode) {
+      stop();
+      visible = false;
       root = next;
       if (nextMode !== mode) {
         mode = nextMode;
@@ -470,7 +524,7 @@ function createPark(initialRoot: HTMLElement, initialMode: ParkMode) {
           actor.def = castFor(mode)(actor.base);
           actor.el.setAttribute("aria-label", actor.def.phrase);
           actor.el.querySelector("span")!.textContent = actor.def.phrase;
-          actor.lastPaths = "";
+          actor.lastPaths = undefined;
         }
       }
       // Scenes don't carry over: a new page starts with just the people.

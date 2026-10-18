@@ -11,7 +11,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "lint": "oxlint src/"
+    "lint": "oxlint src/ tests/ --deny-warnings",
+    "check": "astro check",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/onest": "^5.1.0",
@@ -21,6 +24,11 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "oxlint": "^1.47.0"
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^24.19.0",
+    "oxlint": "^1.47.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
   }
 }

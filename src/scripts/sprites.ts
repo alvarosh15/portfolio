@@ -632,8 +632,13 @@ export function toPaths(buffer: string[][]): Partial<Record<Color, string>> {
 }
 
 /** Recolors a template grid: every `x` becomes `color`. */
+const tinted = new WeakMap<Grid, Map<Color, Grid>>();
 export function tint(grid: Grid, color: Color): Grid {
-  return grid.map((row) => row.replaceAll("x", color));
+  let colors = tinted.get(grid);
+  if (!colors) { colors = new Map(); tinted.set(grid, colors); }
+  let result = colors.get(color);
+  if (!result) { result = grid.map((row) => row.replaceAll("x", color)); colors.set(color, result); }
+  return result;
 }
 
 /** Composes layers into a single grid, for sprites built from several parts. */
@@ -651,8 +656,15 @@ export function svgFor(width: number, height: number) {
     </svg>`;
 }
 
+const painted = new WeakMap<Element, { svg: Element | null; paths: SVGPathElement[] }>();
 export function paint(el: Element, paths: Partial<Record<Color, string>>) {
-  el.querySelectorAll<SVGPathElement>("path[data-color]").forEach((path) => {
-    path.setAttribute("d", paths[path.dataset.color as Color] ?? "");
-  });
+  let target = painted.get(el);
+  if (!target || target.svg !== el.firstElementChild) {
+    target = { svg: el.firstElementChild, paths: [...el.querySelectorAll<SVGPathElement>("path[data-color]")] };
+    painted.set(el, target);
+  }
+  for (const path of target.paths) {
+    const d = paths[path.dataset.color as Color] ?? "";
+    if (path.getAttribute("d") !== d) path.setAttribute("d", d);
+  }
 }

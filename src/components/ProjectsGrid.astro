@@ -40,8 +40,10 @@ const link =
                 src={project.image}
                 alt={`Screenshot of ${project.title}`}
                 widths={[640, 960, 1440, 1920, 2880]}
-                sizes={featured ? "100vw" : "(min-width: 1024px) 50vw, 100vw"}
-                loading={index < 3 ? "eager" : "lazy"}
+                sizes={featured
+                  ? "(min-width: 1600px) 1552px, calc(100vw - 48px)"
+                  : "(min-width: 1600px) 760px, (min-width: 1024px) calc((100vw - 80px) / 2), calc(100vw - 48px)"}
+                loading={featured ? "eager" : "lazy"}
                 class="size-full object-cover object-top"
               />
             </Frame>
